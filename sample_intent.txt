@@ -1,0 +1,2 @@
+Add a percentage_change utility function to src/utils/calc.py for the
+reporting dashboard. Should compute (new - old) / old * 100.

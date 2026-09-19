@@ -1,0 +1,63 @@
+name: PR Sentinel Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Run PR Sentinel
+        id: sentinel
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SENTINEL_BLOCK_SEVERITY: high
+        run: |
+          PYTHONPATH=src python -m pr_sentinel.cli review \
+            --base origin/${{ github.base_ref }} \
+            --head ${{ github.sha }} \
+            --intent "${{ github.event.pull_request.title }}
+
+          ${{ github.event.pull_request.body }}" \
+            --json > review.json
+          PYTHONPATH=src python -c "
+          import json
+          from pr_sentinel.orchestrator import format_markdown_review
+          result = json.load(open('review.json'))
+          print(format_markdown_review(result))
+          " > review.md
+          cat review.md
+
+      - name: Post review comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('review.md', 'utf8');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
+      - name: Gate on severity
+        run: |
+          PYTHONPATH=src python -m pr_sentinel.cli review \
+            --base origin/${{ github.base_ref }} --head ${{ github.sha }} \
+            --fail-on-block

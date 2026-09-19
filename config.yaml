@@ -1,0 +1,23 @@
+model:
+  provider: anthropic
+  reviewer_model: claude-sonnet-4-5
+  arbiter_model: claude-sonnet-4-5
+  small_model: claude-haiku-4-5
+  temperature: 0.0
+  max_tokens: 1500
+
+agents:
+  spec: true
+  correctness: true
+  security: true
+  convention: true
+
+gate:
+  block_severity: high      # low | medium | high | critical
+  max_findings_shown: 25
+  sandbox_timeout_s: 60
+
+repo:
+  convention_index_path: data/convention_index
+  diff_context_lines: 8
+  max_diff_chars: 60000

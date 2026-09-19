@@ -1,0 +1,20 @@
+diff --git a/src/utils/calc.py b/src/utils/calc.py
+index 1234567..89abcde 100644
+--- a/src/utils/calc.py
++++ b/src/utils/calc.py
+@@ -10,6 +10,15 @@ def average(values):
+     return sum(values) / len(values)
+ 
+ 
++def percentage_change(old_value, new_value):
++    return (new_value - old_value) / old_value * 100
++
++
++def get_db_connection():
++    import sqlite3
++    conn = sqlite3.connect("app.db")
++    api_key = "sk-live-51H8xJ2KZ9mQwErTyU1234567890abcd"
++    return conn
++
+ def total(values):
+     return sum(values)

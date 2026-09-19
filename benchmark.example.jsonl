@@ -1,0 +1,1 @@
+{"id": "pr001", "diff_path": "examples/sample.diff", "intent": "Add a percentage_change utility function for the reporting dashboard", "known_issues": [{"file": "src/utils/calc.py", "line": 16, "category": "secret"}, {"file": "src/utils/calc.py", "line": 13, "category": "correctness"}], "clean": false}
